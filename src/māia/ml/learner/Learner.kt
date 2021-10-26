@@ -6,7 +6,8 @@ package māia.ml.learner
 
 import māia.ml.dataset.DataRow
 import māia.ml.dataset.DataStream
-import māia.ml.dataset.WithColumnHeaders
+import māia.ml.dataset.WithColumns
+import māia.ml.dataset.headers.DataColumnHeaders
 import māia.ml.learner.error.LearnerNotInitialisedException
 import māia.ml.learner.type.LearnerType
 import māia.ml.learner.type.classLearnerType
@@ -30,13 +31,13 @@ interface Learner<in D : DataStream<*>> {
     val isInitialised : Boolean
 
     /** The headers that this learner was initialised with. */
-    val trainHeaders : WithColumnHeaders
+    val trainHeaders : DataColumnHeaders
 
     /** The headers that this learner requires to make predictions. */
-    val predictInputHeaders : WithColumnHeaders
+    val predictInputHeaders : DataColumnHeaders
 
     /** The headers of the predictions that this learner will make. */
-    val predictOutputHeaders : WithColumnHeaders
+    val predictOutputHeaders : DataColumnHeaders
 
     /** The type of learner this is once initialised. */
     val initialisedType : LearnerType
@@ -49,9 +50,7 @@ interface Learner<in D : DataStream<*>> {
      *          The header signature of the data that will be used to train
      *          this learner.
      */
-    fun initialise(
-            headers : WithColumnHeaders
-    )
+    fun initialise(headers : WithColumns)
 
     /**
      * Trains the learner on a particular data-set.
@@ -91,7 +90,8 @@ interface Learner<in D : DataStream<*>> {
  */
 inline fun <R> Learner<*>.ensureInitialised(block : () -> R) : R {
     // Make sure the learner is initialised
-    if (!isInitialised) throw LearnerNotInitialisedException(this)
+    if (!isInitialised)
+        throw LearnerNotInitialisedException(this)
 
     return block()
 }
@@ -114,7 +114,7 @@ fun <D : DataStream<*>> Learner<D>.initialiseAndTrain(
         trainingDataset : D
 ) {
     // Initialise
-    initialise(trainingDataset)
+    initialise(trainingDataset.headers)
 
     // Train
     train(trainingDataset)

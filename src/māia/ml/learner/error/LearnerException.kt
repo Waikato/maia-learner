@@ -1,7 +1,6 @@
 package māia.ml.learner.error
 
 import māia.ml.learner.Learner
-import java.lang.Exception
 
 /**
  * Base class for exceptions revolving around the abstract use of learners.

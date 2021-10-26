@@ -1,14 +1,13 @@
 package māia.ml.learner
 
-import māia.ml.dataset.DataColumnHeader
 import māia.ml.dataset.DataBatch
 import māia.ml.dataset.DataRow
 import māia.ml.dataset.DataStream
-import māia.ml.dataset.WithColumnHeaders
+import māia.ml.dataset.WithColumns
+import māia.ml.dataset.headers.DataColumnHeaders
+import māia.ml.dataset.type.DataRepresentation
 import māia.ml.dataset.util.hasEquivalentColumnStructureTo
 import māia.ml.dataset.util.mustHaveEquivalentColumnStructureTo
-import māia.ml.dataset.util.signature
-import māia.ml.dataset.view.WithColumnHeadersView
 import māia.ml.dataset.view.readOnlyViewColumns
 import māia.ml.learner.error.LearnerInitialisationException
 import māia.ml.learner.type.LearnerType
@@ -70,26 +69,23 @@ class LearnerHarness<in D : DataStream<*>> (
     override val isInitialised : Boolean
         get() = base.isInitialised
 
-    override val trainHeaders : WithColumnHeaders
+    override val trainHeaders : DataColumnHeaders
         get() = base.trainHeaders
 
-    override val predictInputHeaders : WithColumnHeaders
+    override val predictInputHeaders : DataColumnHeaders
         get() = base.predictInputHeaders
 
-    override val predictOutputHeaders : WithColumnHeaders
+    override val predictOutputHeaders : DataColumnHeaders
         get() = base.predictOutputHeaders
 
     override val initialisedType : LearnerType
         get() = base.initialisedType
 
     override fun initialise(
-            headers : WithColumnHeaders
+        headers : WithColumns
     ) {
-        // Create a read-only view of the headers
-        val headersView = WithColumnHeadersView(headers.signature())
-
         // Perform the initialisation
-        base.initialise(headersView)
+        base.initialise(headers)
 
         // Check the result of the initialisation
         checkInitialisation(headers)
@@ -151,7 +147,7 @@ class LearnerHarness<in D : DataStream<*>> (
      * Makes sure the initialisation set the attributes of the learner
      * correctly.
      */
-    private fun checkInitialisation(headers : WithColumnHeaders?) {
+    private fun checkInitialisation(headers : WithColumns?) {
         // Make sure the type is fully-specified (i.e. not a union)
         if (initialisedType is UnionLearnerType) throw LearnerInitialisationException(
             this.base,
@@ -167,13 +163,13 @@ class LearnerHarness<in D : DataStream<*>> (
             )
 
         // Create sets of the predict input/output headers
-        val predictInputHeadersSet = IdentityHashSet(predictInputHeaders.iterateColumnHeaders())
-        val predictOutputHeadersSet = IdentityHashSet(predictOutputHeaders.iterateColumnHeaders())
+        val predictInputHeadersSet = IdentityHashSet(predictInputHeaders.iterator())
+        val predictOutputHeadersSet = IdentityHashSet(predictOutputHeaders.iterator())
 
         // Make sure the prediction input headers were chosen from the training headers
         // (can only do this if we have access to the training headers)
         if (headers != null) {
-            val headersSet = IdentityHashSet(headers.iterateColumnHeaders())
+            val headersSet = IdentityHashSet(headers.headers.iterator())
             val diff = predictInputHeadersSet differenceFrom headersSet
             if (!diff.isEmpty())
                 throw LearnerInitialisationException(
@@ -206,13 +202,14 @@ class LearnerHarness<in D : DataStream<*>> (
      */
     private val predictRowProtector = object : DataRow {
         private lateinit var source : DataRow
-        override fun getColumn(columnIndex : Int) : Any? = source.getColumn(columnIndex)
+        override fun <T> getValue(representation : DataRepresentation<*, *, out T>) : T = source.getValue(representation)
+        override val headers : DataColumnHeaders
+            get() = source.headers
         override val numColumns : Int
                 get() = source.numColumns
-        override fun getColumnHeader(columnIndex : Int) : DataColumnHeader = source.getColumnHeader(columnIndex)
         operator fun invoke(value : DataRow) : DataRow {
             source = value
-            return value
+            return this
         }
     }
 

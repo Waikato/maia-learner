@@ -1,6 +1,6 @@
 package māia.ml.learner.type
 
-import māia.ml.dataset.WithColumnHeaders
+import māia.ml.dataset.headers.DataColumnHeaders
 import māia.util.currentOrSet
 
 /**
@@ -12,8 +12,8 @@ import māia.util.currentOrSet
  * @param predictOutputHeaders  The prediction output-headers being checked.
  */
 internal class CheckHeadersCache(
-        private val predictInputHeaders : WithColumnHeaders,
-        private val predictOutputHeaders : WithColumnHeaders
+    private val predictInputHeaders : DataColumnHeaders,
+    private val predictOutputHeaders : DataColumnHeaders
 ) {
     /** The cache of results from component-types. */
     private val cache = HashMap<LearnerType, String?>()

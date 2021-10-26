@@ -7,9 +7,9 @@ package māia.ml.learner
 import māia.ml.dataset.DataBatch
 import māia.ml.dataset.DataRow
 import māia.ml.dataset.DataStream
-import māia.ml.dataset.WithColumnHeaders
-import māia.ml.dataset.util.signature
-import māia.ml.dataset.view.WithColumnHeadersView
+import māia.ml.dataset.WithColumns
+import māia.ml.dataset.headers.DataColumnHeaders
+import māia.ml.dataset.util.copy
 import māia.ml.learner.type.AnyLearnerType
 import māia.ml.learner.type.LearnerType
 import māia.util.*
@@ -46,40 +46,42 @@ abstract class AbstractLearner<in D : DataStream<*>>(
     override val isInitialised : Boolean
         get() = this::trainHeadersPrivate.isInitialized
 
-    override val trainHeaders : WithColumnHeaders
+    override val trainHeaders : DataColumnHeaders
         get() = ensureInitialised { trainHeadersPrivate }
 
-    override val predictInputHeaders : WithColumnHeaders
+    override val predictInputHeaders : DataColumnHeaders
         get() = ensureInitialised { predictInputHeadersPrivate }
 
-    override val predictOutputHeaders : WithColumnHeaders
+    override val predictOutputHeaders : DataColumnHeaders
         get() = ensureInitialised { predictOutputHeadersPrivate }
 
     override val initialisedType : LearnerType
         get() = ensureInitialised { initialisedTypePrivate }
 
     /** Private view of the training headers. */
-    private lateinit var trainHeadersPrivate : WithColumnHeaders
+    private lateinit var trainHeadersPrivate : DataColumnHeaders
 
     /** Private view of the prediction input headers. */
-    private lateinit var predictInputHeadersPrivate : WithColumnHeaders
+    private lateinit var predictInputHeadersPrivate : DataColumnHeaders
 
     /** Private view of the prediction output headers. */
-    private lateinit var predictOutputHeadersPrivate : WithColumnHeaders
+    private lateinit var predictOutputHeadersPrivate : DataColumnHeaders
 
     /** Private view of the initialised type. */
     private lateinit var initialisedTypePrivate : LearnerType
 
     // region Initialisation
 
-    override fun initialise(headers : WithColumnHeaders) {
+    override fun initialise(headers : WithColumns) {
+        // Capture a copy of the training headers
+        trainHeadersPrivate = headers.headers.copy().readOnlyView
+
         // Perform the initialisation
-        val (inputHeaders, outputHeaders, type) = performInitialisation(headers)
+        val (inputHeaders, outputHeaders, type) = performInitialisation(trainHeadersPrivate)
 
         // Set the private views of the initialisation fields
-        trainHeadersPrivate = WithColumnHeadersView(headers.signature())
-        predictInputHeadersPrivate = WithColumnHeadersView(inputHeaders.signature())
-        predictOutputHeadersPrivate = WithColumnHeadersView(outputHeaders.signature())
+        predictInputHeadersPrivate = inputHeaders.copy().readOnlyView
+        predictOutputHeadersPrivate = outputHeaders.copy().readOnlyView
         initialisedTypePrivate = type
     }
 
@@ -96,8 +98,8 @@ abstract class AbstractLearner<in D : DataStream<*>>(
      *          - The type of this initialised learner.
      */
     protected abstract fun performInitialisation(
-            headers : WithColumnHeaders
-    ) : Triple<WithColumnHeaders, WithColumnHeaders, LearnerType>
+            headers : DataColumnHeaders
+    ) : Triple<DataColumnHeaders, DataColumnHeaders, LearnerType>
 
     // endregion
 

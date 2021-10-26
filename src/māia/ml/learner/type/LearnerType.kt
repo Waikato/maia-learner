@@ -1,6 +1,6 @@
 package māia.ml.learner.type
 
-import māia.ml.dataset.WithColumnHeaders
+import māia.ml.dataset.headers.DataColumnHeaders
 import māia.util.*
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
@@ -29,8 +29,8 @@ sealed class LearnerType(val name : String) {
      *                              error message detailing why they don't.
      */
     fun checkHeaders(
-            predictInputHeaders : WithColumnHeaders,
-            predictOutputHeaders : WithColumnHeaders
+        predictInputHeaders : DataColumnHeaders,
+        predictOutputHeaders : DataColumnHeaders
     ) : String? {
         // Create a cache object and check against it
         return checkHeadersCached(CheckHeadersCache(predictInputHeaders, predictOutputHeaders))
@@ -66,7 +66,7 @@ sealed class LearnerType(val name : String) {
         return !(this isSubTypeOf other)
     }
 
-    operator fun contains(headers : Pair<WithColumnHeaders, WithColumnHeaders>) : Boolean {
+    operator fun contains(headers : Pair<DataColumnHeaders, DataColumnHeaders>) : Boolean {
         return checkHeaders(headers.first, headers.second) == null
     }
 
@@ -114,7 +114,6 @@ object AnyLearnerType : LearnerType("Any") {
      * @return              The extended type.
      */
     fun extend(name : String, extension : CheckHeadersFunction) : ExtendedLearnerType {
-
         return ExtendedLearnerType(name,this, extension)
     }
 
