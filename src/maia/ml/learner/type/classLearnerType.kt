@@ -1,8 +1,8 @@
-package māia.ml.learner.type
+package maia.ml.learner.type
 
-import māia.util.property.classlevel.InheritedClassProperty
-import māia.util.property.classlevel.getClassPropertyAccessor
-import māia.ml.learner.Learner
+import maia.util.property.classlevel.InheritedClassProperty
+import maia.util.property.classlevel.getClassPropertyAccessor
+import maia.ml.learner.Learner
 import kotlin.reflect.KClass
 
 /**

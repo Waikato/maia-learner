@@ -1,7 +1,7 @@
-package māia.ml.learner.type
+package maia.ml.learner.type
 
-import māia.ml.dataset.headers.DataColumnHeaders
-import māia.util.currentOrSet
+import maia.ml.dataset.headers.DataColumnHeaders
+import maia.util.currentOrSet
 
 /**
  * Cache object which helps with checking the headers by caching the results of

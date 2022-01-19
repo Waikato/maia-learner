@@ -1,7 +1,7 @@
-package māia.ml.learner.type
+package maia.ml.learner.type
 
-import māia.ml.dataset.headers.DataColumnHeaders
-import māia.util.*
+import maia.ml.dataset.headers.DataColumnHeaders
+import maia.util.*
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 

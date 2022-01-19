@@ -1,8 +1,8 @@
-package māia.ml.learner.util
+package maia.ml.learner.util
 
-import māia.util.datastructure.OrderedSet
-import māia.ml.dataset.util.getHeaderSubsetIndices
-import māia.ml.learner.Learner
+import maia.util.datastructure.OrderedSet
+import maia.ml.dataset.util.getHeaderSubsetIndices
+import maia.ml.learner.Learner
 
 /**
  * The set of column indices from the train headers that were

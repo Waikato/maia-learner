@@ -1,6 +1,6 @@
-package māia.ml.learner.type
+package maia.ml.learner.type
 
-import māia.util.collect
+import maia.util.collect
 
 /**
  * Gets the [LearnerType] that is the intersection of the given types.

@@ -1,8 +1,8 @@
-package māia.ml.learner.type
+package maia.ml.learner.type
 
-import māia.ml.dataset.type.standard.Nominal
-import māia.ml.dataset.type.standard.Numeric
-import māia.util.*
+import maia.ml.dataset.type.standard.Nominal
+import maia.ml.dataset.type.standard.Numeric
+import maia.util.*
 
 val Classifier = AnyLearnerType.extend("Classifying") { _, outputHeaders ->
     outputHeaders

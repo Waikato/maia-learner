@@ -1,21 +1,21 @@
-package māia.ml.learner
+package maia.ml.learner
 
 /*
  * TODO
  */
 
-import māia.ml.dataset.DataBatch
-import māia.ml.dataset.DataRow
-import māia.ml.dataset.DataStream
-import māia.ml.dataset.WithColumns
-import māia.ml.dataset.headers.DataColumnHeaders
-import māia.ml.dataset.util.copy
-import māia.ml.learner.type.AnyLearnerType
-import māia.ml.learner.type.LearnerType
-import māia.util.*
-import māia.util.property.classlevel.override
-import māia.ml.learner.type.classLearnerType
-import māia.ml.learner.type.learnerType
+import maia.ml.dataset.DataBatch
+import maia.ml.dataset.DataRow
+import maia.ml.dataset.DataStream
+import maia.ml.dataset.WithColumns
+import maia.ml.dataset.headers.DataColumnHeaders
+import maia.ml.dataset.util.copy
+import maia.ml.learner.type.AnyLearnerType
+import maia.ml.learner.type.LearnerType
+import maia.util.*
+import maia.util.property.classlevel.override
+import maia.ml.learner.type.classLearnerType
+import maia.ml.learner.type.learnerType
 import kotlin.reflect.KClass
 
 /**

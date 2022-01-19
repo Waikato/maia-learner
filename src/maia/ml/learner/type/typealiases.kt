@@ -1,6 +1,6 @@
-package māia.ml.learner.type
+package maia.ml.learner.type
 
-import māia.ml.dataset.headers.DataColumnHeaders
+import maia.ml.dataset.headers.DataColumnHeaders
 
 /** Type-alias for the signature of the checkHeaders function. */
 typealias CheckHeadersFunction = (DataColumnHeaders, DataColumnHeaders) -> String?

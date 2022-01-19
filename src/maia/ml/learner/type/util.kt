@@ -1,6 +1,6 @@
-package māia.ml.learner.type
+package maia.ml.learner.type
 
-import māia.util.extract
+import maia.util.extract
 
 /**
  * Removes any union-types from the set and re-inserts their component-types.

@@ -1,16 +1,16 @@
-package māia.ml.learner
+package maia.ml.learner
 
 /*
  * Package defining the base learner interface and some utilities for learners.
  */
 
-import māia.ml.dataset.DataRow
-import māia.ml.dataset.DataStream
-import māia.ml.dataset.WithColumns
-import māia.ml.dataset.headers.DataColumnHeaders
-import māia.ml.learner.error.LearnerNotInitialisedException
-import māia.ml.learner.type.LearnerType
-import māia.ml.learner.type.classLearnerType
+import maia.ml.dataset.DataRow
+import maia.ml.dataset.DataStream
+import maia.ml.dataset.WithColumns
+import maia.ml.dataset.headers.DataColumnHeaders
+import maia.ml.learner.error.LearnerNotInitialisedException
+import maia.ml.learner.type.LearnerType
+import maia.ml.learner.type.classLearnerType
 
 /**
  * Interface for machine-learning algorithms.

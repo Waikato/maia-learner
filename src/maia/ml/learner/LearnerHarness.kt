@@ -1,22 +1,22 @@
-package māia.ml.learner
+package maia.ml.learner
 
-import māia.ml.dataset.DataBatch
-import māia.ml.dataset.DataRow
-import māia.ml.dataset.DataStream
-import māia.ml.dataset.WithColumns
-import māia.ml.dataset.headers.DataColumnHeaders
-import māia.ml.dataset.type.DataRepresentation
-import māia.ml.dataset.util.hasEquivalentColumnStructureTo
-import māia.ml.dataset.util.mustHaveEquivalentColumnStructureTo
-import māia.ml.dataset.view.readOnlyViewColumns
-import māia.ml.learner.error.LearnerInitialisationException
-import māia.ml.learner.type.LearnerType
-import māia.ml.learner.type.UnionLearnerType
-import māia.ml.learner.util.predictInputHeaderColumns
-import māia.util.*
-import māia.util.datastructure.IdentityHashSet
-import māia.ml.learner.error.LearnerStaticConfigurationException
-import māia.ml.learner.type.classLearnerType
+import maia.ml.dataset.DataBatch
+import maia.ml.dataset.DataRow
+import maia.ml.dataset.DataStream
+import maia.ml.dataset.WithColumns
+import maia.ml.dataset.headers.DataColumnHeaders
+import maia.ml.dataset.type.DataRepresentation
+import maia.ml.dataset.util.hasEquivalentColumnStructureTo
+import maia.ml.dataset.util.mustHaveEquivalentColumnStructureTo
+import maia.ml.dataset.view.readOnlyViewColumns
+import maia.ml.learner.error.LearnerInitialisationException
+import maia.ml.learner.type.LearnerType
+import maia.ml.learner.type.UnionLearnerType
+import maia.ml.learner.util.predictInputHeaderColumns
+import maia.util.*
+import maia.util.datastructure.IdentityHashSet
+import maia.ml.learner.error.LearnerStaticConfigurationException
+import maia.ml.learner.type.classLearnerType
 import kotlin.reflect.KClass
 
 /**

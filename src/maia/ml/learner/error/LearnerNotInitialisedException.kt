@@ -1,6 +1,6 @@
-package māia.ml.learner.error
+package maia.ml.learner.error
 
-import māia.ml.learner.Learner
+import maia.ml.learner.Learner
 
 /**
  * Exception for when an attempt is made to use a learner before
