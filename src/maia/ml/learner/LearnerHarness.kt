@@ -1,5 +1,6 @@
 package maia.ml.learner
 
+import maia.ml.dataset.AsyncDataStream
 import maia.ml.dataset.DataBatch
 import maia.ml.dataset.DataRow
 import maia.ml.dataset.DataStream
@@ -29,7 +30,7 @@ import kotlin.reflect.KClass
  * @param datasetClass
  *          The type of data-set this learner can be trained on.
  */
-class LearnerHarness<in D : DataStream<*>> (
+class LearnerHarness<in D : AsyncDataStream<*>> (
         val base : Learner<D>,
         datasetClass : KClass<D>
 ) : Learner<D> {
@@ -91,7 +92,7 @@ class LearnerHarness<in D : DataStream<*>> (
         checkInitialisation(headers)
     }
 
-    override fun train(trainingDataset : D) = ensureInitialised {
+    override suspend fun train(trainingDataset : D) = ensureInitialised {
         // Ensure the training data-set matches the initialisation headers
         trainingDataset mustHaveEquivalentColumnStructureTo trainHeaders
 

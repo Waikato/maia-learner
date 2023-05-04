@@ -4,9 +4,11 @@ package maia.ml.learner
  * TODO
  */
 
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import maia.ml.dataset.AsyncDataStream
 import maia.ml.dataset.DataBatch
 import maia.ml.dataset.DataRow
-import maia.ml.dataset.DataStream
 import maia.ml.dataset.WithColumns
 import maia.ml.dataset.headers.DataColumnHeaders
 import maia.ml.dataset.util.copy
@@ -28,7 +30,7 @@ import kotlin.reflect.KClass
  * @param datasetClass
  *          The type of data-set this learner can be trained on.
  */
-abstract class AbstractLearner<in D : DataStream<*>>(
+abstract class AbstractLearner<in D : AsyncDataStream<*>>(
         uninitialisedType : LearnerType? = null,
         datasetClass : KClass<D>
 ) : Learner<D> {
@@ -44,7 +46,7 @@ abstract class AbstractLearner<in D : DataStream<*>>(
     override val isIncremental : Boolean = datasetClass isNotSubClassOf DataBatch::class
 
     override val isInitialised : Boolean
-        get() = this::trainHeadersPrivate.isInitialized
+        get() = this::initialisedTypePrivate.isInitialized
 
     override val trainHeaders : DataColumnHeaders
         get() = ensureInitialised { trainHeadersPrivate }
@@ -70,16 +72,34 @@ abstract class AbstractLearner<in D : DataStream<*>>(
     /** Private view of the initialised type. */
     private lateinit var initialisedTypePrivate : LearnerType
 
+    /** Mutex protecting concurrent mutations of the learner. */
+    private val mutex: Mutex = Mutex()
+
+    protected fun <R> synchronisedSync(block: () -> R): R {
+        if (!mutex.tryLock()) throw ConcurrentModificationException()
+
+        try {
+            return block()
+        } finally {
+            mutex.unlock()
+        }
+    }
+
+    protected suspend fun <R> synchronisedAsync(block: suspend () -> R): R {
+        return mutex.withLock { block() }
+    }
+
     // region Initialisation
 
-    override fun initialise(headers : WithColumns) {
+    override fun initialise(headers : WithColumns) = synchronisedSync {
         // Capture a copy of the training headers
-        trainHeadersPrivate = headers.headers.copy().readOnlyView
+        val headersCopy = headers.headers.copy().readOnlyView
 
         // Perform the initialisation
-        val (inputHeaders, outputHeaders, type) = performInitialisation(trainHeadersPrivate)
+        val (inputHeaders, outputHeaders, type) = performInitialisation(headersCopy)
 
         // Set the private views of the initialisation fields
+        trainHeadersPrivate = headersCopy
         predictInputHeadersPrivate = inputHeaders.copy().readOnlyView
         predictOutputHeadersPrivate = outputHeaders.copy().readOnlyView
         initialisedTypePrivate = type
@@ -105,9 +125,11 @@ abstract class AbstractLearner<in D : DataStream<*>>(
 
     // region Training
 
-    override fun train(trainingDataset : D) = ensureInitialised {
-        // Perform the actual training
-        performTrain(trainingDataset)
+    override suspend fun train(trainingDataset : D) = synchronisedAsync {
+        ensureInitialised {
+            // Perform the actual training
+            performTrain(trainingDataset)
+        }
     }
 
     /**
@@ -117,14 +139,16 @@ abstract class AbstractLearner<in D : DataStream<*>>(
      *          The data-set to train the learner on. Should match the headers
      *          that were passed to [initialise].
      */
-    protected abstract fun performTrain(trainingDataset : D)
+    protected abstract suspend fun performTrain(trainingDataset : D)
 
     // endregion
 
     // region Prediction
 
-    override fun predict(row : DataRow) : DataRow = ensureInitialised {
-        return performPredict(row)
+    override fun predict(row : DataRow) : DataRow = synchronisedSync {
+        ensureInitialised {
+            performPredict(row)
+        }
     }
 
     /**

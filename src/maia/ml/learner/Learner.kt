@@ -4,8 +4,8 @@ package maia.ml.learner
  * Package defining the base learner interface and some utilities for learners.
  */
 
+import maia.ml.dataset.AsyncDataStream
 import maia.ml.dataset.DataRow
-import maia.ml.dataset.DataStream
 import maia.ml.dataset.WithColumns
 import maia.ml.dataset.headers.DataColumnHeaders
 import maia.ml.learner.error.LearnerNotInitialisedException
@@ -18,7 +18,7 @@ import maia.ml.learner.type.classLearnerType
  * @param D
  *          The type of data-set that can be learned from.
  */
-interface Learner<in D : DataStream<*>> {
+sealed interface Learner<in D : AsyncDataStream<*>> {
 
     /** The type of learner this is before it is initialised. */
     val uninitialisedType : LearnerType
@@ -59,7 +59,7 @@ interface Learner<in D : DataStream<*>> {
      *          The data-set to train the learner on. Should match the headers
      *          that were passed to [initialise].
      */
-    fun train(trainingDataset : D)
+    suspend fun train(trainingDataset : D)
 
     /**
      * Performs prediction for a data-row.
@@ -110,7 +110,7 @@ inline fun <R> Learner<*>.ensureInitialised(block : () -> R) : R {
  * @param D
  *          The type of data-set that can be learned from.
  */
-fun <D : DataStream<*>> Learner<D>.initialiseAndTrain(
+suspend fun <D : AsyncDataStream<*>> Learner<D>.initialiseAndTrain(
         trainingDataset : D
 ) {
     // Initialise
