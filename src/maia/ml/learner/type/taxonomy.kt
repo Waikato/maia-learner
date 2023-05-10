@@ -7,7 +7,7 @@ import maia.util.*
 val Classifier = AnyLearnerType.extend("Classifying") { _, outputHeaders ->
     outputHeaders
             .iterator()
-            .filter { it.type !is Nominal<*, *, *, *> }
+            .filter { it.type !is Nominal<*, *, *, *, *> }
             .map {
                 "Header ${it.name} at position $it in prediction outputs " +
                         "is not a nominal column (${it.type})"
