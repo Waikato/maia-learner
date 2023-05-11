@@ -1,5 +1,7 @@
 package maia.ml.learner
 
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.runBlocking
 import maia.ml.dataset.AsyncDataStream
 import maia.ml.dataset.DataBatch
 import maia.ml.dataset.DataRow
@@ -30,7 +32,7 @@ import kotlin.reflect.KClass
  * @param datasetClass
  *          The type of data-set this learner can be trained on.
  */
-class LearnerHarness<in D : AsyncDataStream<*>> (
+class LearnerHarness<in D : DataStream<*>> (
         val base : Learner<D>,
         datasetClass : KClass<D>
 ) : Learner<D> {
@@ -124,7 +126,7 @@ class LearnerHarness<in D : AsyncDataStream<*>> (
      *          An action to perform on the predictor/prediction rows.
      */
     fun predict(
-            rows : DataStream<*>,
+            rows : AsyncDataStream<*>,
             block : NoInlineUnit.(DataRow, DataRow) -> Unit
     ) = ensureInitialised {
         // If the prediction data-set is structured like the training data-set,
@@ -137,9 +139,19 @@ class LearnerHarness<in D : AsyncDataStream<*>> (
             rows
         }
 
-        noInlineNonLocalReturn {
-            for (row in predictRows.rowIterator()) {
-                block(row, getPredictionFromBase(row))
+        if (predictRows is DataStream<*>) {
+            noInlineNonLocalReturn {
+                for (row in predictRows.rowIterator()) {
+                    block(row, getPredictionFromBase(row))
+                }
+            }
+        } else {
+            runBlocking {
+                noInlineNonLocalReturn {
+                    predictRows.rowFlow().collect { row ->
+                        block(row, getPredictionFromBase(row))
+                    }
+                }
             }
         }
     }
